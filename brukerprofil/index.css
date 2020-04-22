@@ -2,6 +2,7 @@ body, html {
     margin: 0;
     padding: 0;
     font-family: Arial, Helvetica, sans-serif;
+    background-color: rgb(196, 243, 196);
 }
 
 * {
@@ -28,4 +29,10 @@ input, button {
 h1 {
     font-size: 3.8rem;
     padding: 1rem;
+    color: rgb(129, 129, 129);
+}
+
+h3 {
+    position: bottom;
+    opacity: 40%;
 }
