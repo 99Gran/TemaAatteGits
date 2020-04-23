@@ -10,6 +10,8 @@ const squareA = tall => tall * tall
 
 console.log(squareA(21))
 
+//////////////////////////////////////////////
+
 const fler = (name1, name2) => 'Hei ' + name1 + ' og ' + name2
 
 console.log(fler('Simon', 'Per'))
@@ -19,6 +21,8 @@ setTimeout(() => document.querySelector('body').style.backgroundColor='orange', 
 const antallTegn = ord => 'Dette ordet har ' + ord.length + ' karakterer'
 
 console.log(antallTegn('nikodemos'))
+
+//////////////////////////////////////////////
 
 const tallene = [12, 2, 45, 56, 67, 4, 34, 32, 5]
 
@@ -30,12 +34,16 @@ tallene.map( tall => {
     body.appendChild(newLi)
 })
 
+//////////////////////////////////////////////
+
 const ordene = ['løver', 'katter', 'elefanter', 'oligarker', 'prinser']
 
 let str = ''
 ordene.map ( ord => {
     str += `<section>Det satt to ${ord} på ett bord</section>`
 })
+
+//////////////////////////////////////////////
 
 body.innerHTML = str
 
