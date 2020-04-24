@@ -15,6 +15,12 @@ main {
     height: 100vh;
 }
 
+label {
+    padding: 1rem;
+    font-weight: 600;
+    color: rgb(129, 129, 129);
+}
+
 input, button {
     display: block;
     min-width: 30vw;

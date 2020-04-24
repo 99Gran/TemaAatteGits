@@ -10,9 +10,12 @@
     <main>
         <div class='form'>
             <h1>Lag brukerprofil</h1>
-            <input id='name' placeholder="Skriv inn navnet ditt" type="text">
-            <input id='email' placeholder="Skriv inn e-posten din" type="text">
-            <input id='passord' placeholder="Skriv inn et passord (Minst 7 tegn)"   type="password">
+            <label for="name">Skriv inn navnet ditt</label>
+            <input id='name' placeholder="Navnet ditt" type="text">
+            <label for="email">Skriv inn e-post adressen din</label>
+            <input id='email' placeholder="Ex: minmail@mail.no" type="text">
+            <label for="passord">Lag passord(Minst 7 tegn):</label>
+            <input id='passord' minlength="7" type="password">
             <input type="checkbox" name="agree" id="agree"><label for="agree">Jeg er enig med 'Terms of service' og 'Privacy Policy'</label>
             <button id='submit'>OK</button>
         </div>
