@@ -63,30 +63,46 @@ const skurker = [
   {navn: "Brødrene Dalton", egenskap: "Jobber godt sammen"}
 ]
 
-const godPaa = skurker.filter(element => element.egenskap += 'Jessie James')
+const godPaa = skurker.filter(element => element.egenskap < 'Jessie James')
 
 console.log(godPaa)
+//HALVVEIS FERDIG (Får frem navn og egenskap, må ta vekk navn)
 
 
 /////////////////////////////// OPPGAVE 6
 
-//const ulMatretter = document.querySelector("#ulMatretter")
+const ulMatretter = document.querySelector("#ulMatretter")
 
-//const matretter = ["Kapteinens favoritt", "Kjøtt utklemt i panne", "Biff Stroganof"]
+const matretter = ["Kapteinens favoritt", "Kjøtt utklemt i panne", "Biff Stroganof"]
 
-// Her kommer din kode
+const meny = (matretter) => {
+  let ul = document.createElement('ul')
+  let li = document.createElement('li')
+  ul.innerHTML = matretter
+  ul.appendChild(li)
+  matretter.appendChild(li)
+  newArray.map (Element = matretter(Element))
+}
+
+console.log(matretter)
+// NINI, YOU MADE IT
 
 
 /////////////////////////////// OPPGAVE 7
 
-//const words1 = ["The", "way", "you"]
-//const words2 = ["make", "me", "feel"]
+const words1 = ["The", "way", "you"]
+const words2 = ["make", "me", "feel"]
 
-//const theTitle = // Her legger du inn koden som setter sammen arrayene i ett array
-//console.log(theTitle)
+const theTitle = [].concat(words1, words2);
+
+console.log(theTitle)
+// NINI, YOU MADE IT
 
 
 /////////////////////////////// OPPGAVE 8
 
-/*let sitat = ["har", "gull", "i"]
-sitat = // Her kommer din kode*/
+let sitat = ["har", "gull", "i"]
+sitat = (sitat + ' munn')
+
+console.log(sitat)
+//HALVVEIS FERDIG
