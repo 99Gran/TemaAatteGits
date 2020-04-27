@@ -9,15 +9,27 @@
 <body>
     <main>
         <div class='form'>
-            <h1>Lag brukerprofil</h1>
-            <label for="name">Skriv inn navnet ditt</label>
-            <input id='name' placeholder="Navnet ditt" type="text">
-            <label for="email">Skriv inn e-post adressen din</label>
-            <input id='email' placeholder="Ex: minmail@mail.no" type="text">
-            <label for="passord">Lag passord(Minst 7 tegn):</label>
-            <input id='passord' minlength="7" type="password">
-            <input type="checkbox" name="agree" id="agree"><label for="agree">Jeg er enig med 'Terms of service' og 'Privacy Policy'</label>
-            <button id='submit'>OK</button>
+                <h1>Lag brukerprofil</h1>
+                <label for="name">Skriv inn navnet ditt</label>
+                <input id='name' placeholder="Navnet ditt" type="text">
+                <label for="email">Skriv inn e-post adressen din</label>
+                <input id='email' placeholder="Ex: minmail@mail.no"     type="text">
+                <label for="passord">Lag passord(Minst 7 tegn):</label>
+                <input id='passord' minlength="7" type="password">
+            <div id='aktiv'>
+                <h2>Aktiviteter du liker:</h2>
+                <input type="checkbox" name="fjelltur" id="fjelltur">
+                <label for="fjelltur">Fjelltur</label>
+                <input type="checkbox" name="brettspill" id="brettspill">
+                <label for="brettspill">Brettspill</label>
+                <input type="checkbox" name="strikking" id="strikking">
+                <label for="strikking">Strikking</label>
+                <input type="checkbox" name="matlaging" id="matlaging">
+                <label for="matlaging">Matlaging</label>
+            </div>
+                <input type="checkbox" name="agree" id="agree">
+                <label for="agree">Jeg er enig med 'Terms of service' og 'Privacy Policy'</label>
+                <button id='submit'>OK</button>
         </div>
         <h3>Oslo Kommune</h3>
     </main>

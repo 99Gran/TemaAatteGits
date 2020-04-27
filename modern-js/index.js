@@ -35,10 +35,13 @@ console.log(addMeToTheSong('Tom'))
 
 const tallene = [12, 82, 45, 56, 67, 4, 34, 32, 95, 89]
 
-/*const underAatti = (tallene) => {
-    age >= 20;
+const underOver = tallene.filter(tallene => tallene > 20)
+
+/*const underOver = (tallene) => {
+    tallene > 20;
 }*/
 
+console.log(underOver)
 
 /////////////////////////////// OPPGAVE 4
 
