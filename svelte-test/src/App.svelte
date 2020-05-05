@@ -17,7 +17,8 @@
 <main>
 	<button on:click = {getActivity}>HIT ME</button>
 	<input type='text' bind:value={type}>
-	<!--<Activity {activity}/>-->
+	<!--<input type='number' bind:value={activity.participants}>
+	<Activity {activity}/>-->
 	{#if show}
 		 <Activity {activity} />
 	{:else}
