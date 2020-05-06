@@ -1,9 +1,6 @@
 <script>
 	import Datamuse from './components/Datamuse.svelte'
 	let words = ''
-	const hei = event => {
-		event.target.placeholder = 'woop woop'
-	}
 </script>
 
 <main>
