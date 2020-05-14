@@ -1,0 +1,12 @@
+{
+  "version": 3,
+  "file": "bundle.css",
+  "sources": [
+    "../../App.svelte"
+  ],
+  "sourcesContent": [
+    "<script>\n\tconst { remote } = require('electron')\n\tconst { Menu, MenuItem } = remote\n\tlet info = 'Nothing happening yet'\n\n\tconst showNotification = (title, message) => {\n    \tlet myNotification = new Notification(title, {\n      \tbody: message\n    \t})\n    \tmyNotification.onclick = () => {\n        info = 'Notification clicked'\n    \t}\n\t}\n\n\tconst amIOnline = () => {\n   \t\t window.alert(navigator.onLine ? 'you\\'re online ma\\'am' : 'you\\'re offline')\n    \tinfo = 'Alert accepted'\n\t}\n\n\tconst menu = new Menu()\n\t\tmenu.append(new MenuItem({ label: 'menu 1', click() { info = 'item 1 clicked' } }))\n\t\tmenu.append(new MenuItem({ type: 'separator' }))\n\t\tmenu.append(new MenuItem({ label: 'menu 2', click() { info = 'item 2 clicked' } } ))\n\n\tconst context = e => {\n  \t\te.preventDefault()\n  \t\tmenu.popup({ window: remote.getCurrentWindow() })\n\t\t}\n</script>\n\n<main>\n\t<hr>\n\t<div class=\"stuff\" on:contextmenu={context}></div>\n    <h1>Svelte in Electron</h1>\n    <p>{info}</p>\n\t<button on:click={ () => showNotification('Hei', 'Hvordan går det i dag?') }>Klikk meg</button>\n\t<button on:click={ () => amIOnline() }>2 b or not 2 b online</button>\n</main>\n\n<style>\n\tmain {\n\t\tdisplay: grid;\n\t\tpadding: 10vw;\n\t\tposition: absolute;\n\t\ttext-align: center;\n\t}\n\tbutton {\n\t\twidth: 20vw;\n\t}\n\t.stuff {\n\t\twidth: 100%;\n\t\theight: 100px;\n\t\tbackground-color: antiquewhite;\n\t}\n</style>"
+  ],
+  "names": [],
+  "mappings": "AAwCC,IAAI,eAAC,CAAC,AACL,OAAO,CAAE,IAAI,CACb,OAAO,CAAE,IAAI,CACb,QAAQ,CAAE,QAAQ,CAClB,UAAU,CAAE,MAAM,AACnB,CAAC,AACD,MAAM,eAAC,CAAC,AACP,KAAK,CAAE,IAAI,AACZ,CAAC,AACD,MAAM,eAAC,CAAC,AACP,KAAK,CAAE,IAAI,CACX,MAAM,CAAE,KAAK,CACb,gBAAgB,CAAE,YAAY,AAC/B,CAAC"
+}
