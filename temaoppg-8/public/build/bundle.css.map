@@ -1,0 +1,12 @@
+{
+  "version": 3,
+  "file": "bundle.css",
+  "sources": [
+    "../../App.svelte"
+  ],
+  "sourcesContent": [
+    "<script>\n\tlet q = ''\n\tlet dadjoke\n\tlet favorites = []\n\tlet showFaves = false\n\n\tconst addToFaves = (dadjoke) => {\n\t\tif(!favorites.includes(dadjoke)){\n\t\t\tfavorites = [dadjoke, ...favorites]\n\t\t}else{\n\t\t\tfavorites = favorites.filter( element => element != dadjoke)\n\t\t}\n\t\tif(favorites.length == 0) showFaves = false\n\t}\n\n\tconst getDadJoke = () => {\n\t\tdadjoke = null\n\t\tfetch(`https://icanhazdadjoke.com/search`)\n\t\t\t.this( res => res.json() )\n\t\t\t\t.then( json => {\n\t\t\t\t\tdadjoke.json.data[0].joke\n\t\t\t\t})\n\t}\n</script>\n\n<main>\n\t<header>\n\t\t<h1>DadJokes</h1>\n\t\t<input placeholder='Get silly' type=\"text\" bind:value={q}>\n\t\t<button on:click={getDadJoke}>Get dad joke</button>\n\t</header>\n\n\t\t{#if dadjoke}\n\t\t\t<h3>{dadjoke.joke}</h3>\n\t\t{:else}\n\t\t<h2>Search for some damn good dad jokes</h2>\n\t{/if}\n</main>\n\n<style>\n\t:global(body, html) {\n\t\tmargin: 0;\n\t\tpadding: 0;\n\t}\n\t:global(*) {\n\t\tbox-sizing: border-box;\n\t}\n\tmain {\n\t\tdisplay: grid;\n\t\tplace-items: center;\n\t\theight: 100%;\n\t\tposition: relative;\n\t\ttext-align: center;\n\t\t/* padding: 1em;\n\t\tmax-width: 240px;\n\t\tmargin: 0 auto;*/\n\t}\n\th1 {\n\t\tcolor: #4791f3;\n\t\ttext-transform: uppercase;\n\t\tfont-size: 4em;\n\t\tfont-weight: 700;\n\t}\n\th2 {\n\t\tpadding-top: 8rem;\n\t}\n\tinput {\n\t\tborder: none;\n\t\tborder-bottom: 1px solid black;\n\t\toutline: none;\n\t\ttext-align: center;\n\t}\n\theader {\n\t\tposition: absolute;\n\t\ttop: 2rem;\n\t\twidth: 50%;\n\t\tdisplay: grid;\n\t}\n</style>"
+  ],
+  "names": [],
+  "mappings": "AAwCS,UAAU,AAAE,CAAC,AACpB,MAAM,CAAE,CAAC,CACT,OAAO,CAAE,CAAC,AACX,CAAC,AACO,CAAC,AAAE,CAAC,AACX,UAAU,CAAE,UAAU,AACvB,CAAC,AACD,IAAI,eAAC,CAAC,AACL,OAAO,CAAE,IAAI,CACb,WAAW,CAAE,MAAM,CACnB,MAAM,CAAE,IAAI,CACZ,QAAQ,CAAE,QAAQ,CAClB,UAAU,CAAE,MAAM,AAInB,CAAC,AACD,EAAE,eAAC,CAAC,AACH,KAAK,CAAE,OAAO,CACd,cAAc,CAAE,SAAS,CACzB,SAAS,CAAE,GAAG,CACd,WAAW,CAAE,GAAG,AACjB,CAAC,AACD,EAAE,eAAC,CAAC,AACH,WAAW,CAAE,IAAI,AAClB,CAAC,AACD,KAAK,eAAC,CAAC,AACN,MAAM,CAAE,IAAI,CACZ,aAAa,CAAE,GAAG,CAAC,KAAK,CAAC,KAAK,CAC9B,OAAO,CAAE,IAAI,CACb,UAAU,CAAE,MAAM,AACnB,CAAC,AACD,MAAM,eAAC,CAAC,AACP,QAAQ,CAAE,QAAQ,CAClB,GAAG,CAAE,IAAI,CACT,KAAK,CAAE,GAAG,CACV,OAAO,CAAE,IAAI,AACd,CAAC"
+}
