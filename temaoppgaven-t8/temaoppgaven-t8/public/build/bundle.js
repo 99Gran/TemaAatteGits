@@ -1,9 +1,12 @@
 
 (function(l, r) { if (l.getElementById('livereloadscript')) return; r = l.createElement('script'); r.async = 1; r.src = '//' + (window.location.host || 'localhost').split(':')[0] + ':35729/livereload.js?snipver=1'; r.id = 'livereloadscript'; l.head.appendChild(r) })(window.document);
-var app = (function (apikeys_js) {
+var app = (function (jokes) {
     'use strict';
 
+    jokes = jokes && jokes.hasOwnProperty('default') ? jokes['default'] : jokes;
+
     function noop() { }
+    const identity = x => x;
     function add_location(element, file, line, column, char) {
         element.__svelte_meta = {
             loc: { file, line, column, char }
@@ -23,6 +26,41 @@ var app = (function (apikeys_js) {
     }
     function safe_not_equal(a, b) {
         return a != a ? b == b : a !== b || ((a && typeof a === 'object') || typeof a === 'function');
+    }
+
+    const is_client = typeof window !== 'undefined';
+    let now = is_client
+        ? () => window.performance.now()
+        : () => Date.now();
+    let raf = is_client ? cb => requestAnimationFrame(cb) : noop;
+
+    const tasks = new Set();
+    function run_tasks(now) {
+        tasks.forEach(task => {
+            if (!task.c(now)) {
+                tasks.delete(task);
+                task.f();
+            }
+        });
+        if (tasks.size !== 0)
+            raf(run_tasks);
+    }
+    /**
+     * Creates a new task that runs on each raf frame
+     * until it returns a falsy value or is aborted
+     */
+    function loop(callback) {
+        let task;
+        if (tasks.size === 0)
+            raf(run_tasks);
+        return {
+            promise: new Promise(fulfill => {
+                tasks.add(task = { c: callback, f: fulfill });
+            }),
+            abort() {
+                tasks.delete(task);
+            }
+        };
     }
 
     function append(target, node) {
@@ -60,6 +98,62 @@ var app = (function (apikeys_js) {
         const e = document.createEvent('CustomEvent');
         e.initCustomEvent(type, false, false, detail);
         return e;
+    }
+
+    let stylesheet;
+    let active = 0;
+    let current_rules = {};
+    // https://github.com/darkskyapp/string-hash/blob/master/index.js
+    function hash(str) {
+        let hash = 5381;
+        let i = str.length;
+        while (i--)
+            hash = ((hash << 5) - hash) ^ str.charCodeAt(i);
+        return hash >>> 0;
+    }
+    function create_rule(node, a, b, duration, delay, ease, fn, uid = 0) {
+        const step = 16.666 / duration;
+        let keyframes = '{\n';
+        for (let p = 0; p <= 1; p += step) {
+            const t = a + (b - a) * ease(p);
+            keyframes += p * 100 + `%{${fn(t, 1 - t)}}\n`;
+        }
+        const rule = keyframes + `100% {${fn(b, 1 - b)}}\n}`;
+        const name = `__svelte_${hash(rule)}_${uid}`;
+        if (!current_rules[name]) {
+            if (!stylesheet) {
+                const style = element('style');
+                document.head.appendChild(style);
+                stylesheet = style.sheet;
+            }
+            current_rules[name] = true;
+            stylesheet.insertRule(`@keyframes ${name} ${rule}`, stylesheet.cssRules.length);
+        }
+        const animation = node.style.animation || '';
+        node.style.animation = `${animation ? `${animation}, ` : ``}${name} ${duration}ms linear ${delay}ms 1 both`;
+        active += 1;
+        return name;
+    }
+    function delete_rule(node, name) {
+        node.style.animation = (node.style.animation || '')
+            .split(', ')
+            .filter(name
+            ? anim => anim.indexOf(name) < 0 // remove specific animation
+            : anim => anim.indexOf('__svelte') === -1 // remove all Svelte animations
+        )
+            .join(', ');
+        if (name && !--active)
+            clear_rules();
+    }
+    function clear_rules() {
+        raf(() => {
+            if (active)
+                return;
+            let i = stylesheet.cssRules.length;
+            while (i--)
+                stylesheet.deleteRule(i);
+            current_rules = {};
+        });
     }
 
     let current_component;
@@ -129,12 +223,89 @@ var app = (function (apikeys_js) {
             $$.after_update.forEach(add_render_callback);
         }
     }
+
+    let promise;
+    function wait() {
+        if (!promise) {
+            promise = Promise.resolve();
+            promise.then(() => {
+                promise = null;
+            });
+        }
+        return promise;
+    }
+    function dispatch(node, direction, kind) {
+        node.dispatchEvent(custom_event(`${direction ? 'intro' : 'outro'}${kind}`));
+    }
     const outroing = new Set();
     function transition_in(block, local) {
         if (block && block.i) {
             outroing.delete(block);
             block.i(local);
         }
+    }
+    const null_transition = { duration: 0 };
+    function create_in_transition(node, fn, params) {
+        let config = fn(node, params);
+        let running = false;
+        let animation_name;
+        let task;
+        let uid = 0;
+        function cleanup() {
+            if (animation_name)
+                delete_rule(node, animation_name);
+        }
+        function go() {
+            const { delay = 0, duration = 300, easing = identity, tick = noop, css } = config || null_transition;
+            if (css)
+                animation_name = create_rule(node, 0, 1, duration, delay, easing, css, uid++);
+            tick(0, 1);
+            const start_time = now() + delay;
+            const end_time = start_time + duration;
+            if (task)
+                task.abort();
+            running = true;
+            add_render_callback(() => dispatch(node, true, 'start'));
+            task = loop(now => {
+                if (running) {
+                    if (now >= end_time) {
+                        tick(1, 0);
+                        dispatch(node, true, 'end');
+                        cleanup();
+                        return running = false;
+                    }
+                    if (now >= start_time) {
+                        const t = easing((now - start_time) / duration);
+                        tick(t, 1 - t);
+                    }
+                }
+                return running;
+            });
+        }
+        let started = false;
+        return {
+            start() {
+                if (started)
+                    return;
+                delete_rule(node);
+                if (is_function(config)) {
+                    config = config();
+                    wait().then(go);
+                }
+                else {
+                    go();
+                }
+            },
+            invalidate() {
+                started = false;
+            },
+            end() {
+                if (running) {
+                    cleanup();
+                    running = false;
+                }
+            }
+        };
     }
     function mount_component(component, target, anchor) {
         const { fragment, on_mount, on_destroy, after_update } = component.$$;
@@ -307,52 +478,94 @@ var app = (function (apikeys_js) {
         $inject_state() { }
     }
 
+    function cubicOut(t) {
+        const f = t - 1.0;
+        return f * f * f + 1.0;
+    }
+
+    function fade(node, { delay = 0, duration = 400, easing = identity }) {
+        const o = +getComputedStyle(node).opacity;
+        return {
+            delay,
+            duration,
+            easing,
+            css: t => `opacity: ${t * o}`
+        };
+    }
+    function fly(node, { delay = 0, duration = 400, easing = cubicOut, x = 0, y = 0, opacity = 0 }) {
+        const style = getComputedStyle(node);
+        const target_opacity = +style.opacity;
+        const transform = style.transform === 'none' ? '' : style.transform;
+        const od = target_opacity * (1 - opacity);
+        return {
+            delay,
+            duration,
+            easing,
+            css: (t, u) => `
+			transform: ${transform} translate(${(1 - t) * x}px, ${(1 - t) * y}px);
+			opacity: ${target_opacity - (od * u)}`
+        };
+    }
+    function scale(node, { delay = 0, duration = 400, easing = cubicOut, start = 0, opacity = 0 }) {
+        const style = getComputedStyle(node);
+        const target_opacity = +style.opacity;
+        const transform = style.transform === 'none' ? '' : style.transform;
+        const sd = 1 - start;
+        const od = target_opacity * (1 - opacity);
+        return {
+            delay,
+            duration,
+            easing,
+            css: (_t, u) => `
+			transform: ${transform} scale(${1 - (sd * u)});
+			opacity: ${target_opacity - (od * u)}
+		`
+        };
+    }
+
     /* src/App.svelte generated by Svelte v3.19.1 */
     const file = "src/App.svelte";
 
-    // (31:1) {#if recipe}
+    // (35:2) {#if favorites.length > 0}
     function create_if_block(ctx) {
-    	let h1;
-    	let t0_value = /*recipe*/ ctx[0].title + "";
-    	let t0;
-    	let t1;
-    	let img;
-    	let img_src_value;
-    	let img_alt_value;
+    	let button;
+
+    	let t_value = (/*showFavs*/ ctx[0]
+    	? "Skjul favoritter"
+    	: "Vis favoritter") + "";
+
+    	let t;
+    	let button_intro;
+    	let dispose;
 
     	const block = {
     		c: function create() {
-    			h1 = element("h1");
-    			t0 = text(t0_value);
-    			t1 = space();
-    			img = element("img");
-    			attr_dev(h1, "class", "svelte-2x1evt");
-    			add_location(h1, file, 31, 2, 964);
-    			if (img.src !== (img_src_value = /*recipe*/ ctx[0].image)) attr_dev(img, "src", img_src_value);
-    			attr_dev(img, "alt", img_alt_value = /*recipe*/ ctx[0].title);
-    			add_location(img, file, 32, 2, 990);
+    			button = element("button");
+    			t = text(t_value);
+    			add_location(button, file, 35, 8, 715);
     		},
     		m: function mount(target, anchor) {
-    			insert_dev(target, h1, anchor);
-    			append_dev(h1, t0);
-    			insert_dev(target, t1, anchor);
-    			insert_dev(target, img, anchor);
+    			insert_dev(target, button, anchor);
+    			append_dev(button, t);
+    			dispose = listen_dev(button, "click", /*click_handler*/ ctx[5], false, false, false);
     		},
     		p: function update(ctx, dirty) {
-    			if (dirty & /*recipe*/ 1 && t0_value !== (t0_value = /*recipe*/ ctx[0].title + "")) set_data_dev(t0, t0_value);
-
-    			if (dirty & /*recipe*/ 1 && img.src !== (img_src_value = /*recipe*/ ctx[0].image)) {
-    				attr_dev(img, "src", img_src_value);
-    			}
-
-    			if (dirty & /*recipe*/ 1 && img_alt_value !== (img_alt_value = /*recipe*/ ctx[0].title)) {
-    				attr_dev(img, "alt", img_alt_value);
+    			if (dirty & /*showFavs*/ 1 && t_value !== (t_value = (/*showFavs*/ ctx[0]
+    			? "Skjul favoritter"
+    			: "Vis favoritter") + "")) set_data_dev(t, t_value);
+    		},
+    		i: function intro(local) {
+    			if (!button_intro) {
+    				add_render_callback(() => {
+    					button_intro = create_in_transition(button, scale, {});
+    					button_intro.start();
+    				});
     			}
     		},
+    		o: noop,
     		d: function destroy(detaching) {
-    			if (detaching) detach_dev(h1);
-    			if (detaching) detach_dev(t1);
-    			if (detaching) detach_dev(img);
+    			if (detaching) detach_dev(button);
+    			dispose();
     		}
     	};
 
@@ -360,7 +573,7 @@ var app = (function (apikeys_js) {
     		block,
     		id: create_if_block.name,
     		type: "if",
-    		source: "(31:1) {#if recipe}",
+    		source: "(35:2) {#if favorites.length > 0}",
     		ctx
     	});
 
@@ -369,143 +582,45 @@ var app = (function (apikeys_js) {
 
     function create_fragment(ctx) {
     	let main;
+    	let header;
     	let h1;
     	let t1;
-    	let h3;
-    	let t3;
-    	let label0;
-    	let t5;
-    	let input0;
-    	let t6;
-    	let label1;
-    	let t8;
-    	let input1;
-    	let t9;
-    	let label2;
-    	let t11;
-    	let input2;
-    	let t12;
-    	let hr0;
-    	let t13;
-    	let button;
-    	let t15;
-    	let hr1;
-    	let t16;
-    	let dispose;
-    	let if_block = /*recipe*/ ctx[0] && create_if_block(ctx);
+    	let if_block = /*favorites*/ ctx[1].length > 0 && create_if_block(ctx);
 
     	const block = {
     		c: function create() {
     			main = element("main");
+    			header = element("header");
     			h1 = element("h1");
-    			h1.textContent = "Hello cookie!";
+    			h1.textContent = "Dad Jokes";
     			t1 = space();
-    			h3 = element("h3");
-    			h3.textContent = "Whats in the fridge?";
-    			t3 = space();
-    			label0 = element("label");
-    			label0.textContent = "sukker";
-    			t5 = space();
-    			input0 = element("input");
-    			t6 = space();
-    			label1 = element("label");
-    			label1.textContent = "mel";
-    			t8 = space();
-    			input1 = element("input");
-    			t9 = space();
-    			label2 = element("label");
-    			label2.textContent = "epler";
-    			t11 = space();
-    			input2 = element("input");
-    			t12 = space();
-    			hr0 = element("hr");
-    			t13 = space();
-    			button = element("button");
-    			button.textContent = "finn oppskrift";
-    			t15 = space();
-    			hr1 = element("hr");
-    			t16 = space();
     			if (if_block) if_block.c();
-    			attr_dev(h1, "class", "svelte-2x1evt");
-    			add_location(h1, file, 19, 1, 568);
-    			add_location(h3, file, 20, 1, 592);
-    			attr_dev(label0, "for", "sugar");
-    			add_location(label0, file, 21, 1, 623);
-    			attr_dev(input0, "id", "+sugar");
-    			attr_dev(input0, "type", "checkbox");
-    			add_location(input0, file, 22, 1, 658);
-    			attr_dev(label1, "for", "flour");
-    			add_location(label1, file, 23, 1, 710);
-    			attr_dev(input1, "id", "+flour");
-    			attr_dev(input1, "type", "checkbox");
-    			add_location(input1, file, 24, 1, 742);
-    			attr_dev(label2, "for", "apples");
-    			add_location(label2, file, 25, 1, 794);
-    			attr_dev(input2, "id", "+apples");
-    			attr_dev(input2, "type", "checkbox");
-    			add_location(input2, file, 26, 1, 829);
-    			add_location(hr0, file, 27, 1, 882);
-    			add_location(button, file, 28, 1, 888);
-    			add_location(hr1, file, 29, 1, 943);
-    			attr_dev(main, "class", "svelte-2x1evt");
-    			add_location(main, file, 18, 0, 560);
+    			attr_dev(h1, "class", "svelte-y3qnpx");
+    			add_location(h1, file, 29, 2, 421);
+    			add_location(header, file, 28, 1, 410);
+    			attr_dev(main, "class", "svelte-y3qnpx");
+    			add_location(main, file, 27, 0, 402);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, main, anchor);
-    			append_dev(main, h1);
-    			append_dev(main, t1);
-    			append_dev(main, h3);
-    			append_dev(main, t3);
-    			append_dev(main, label0);
-    			append_dev(main, t5);
-    			append_dev(main, input0);
-    			append_dev(main, t6);
-    			append_dev(main, label1);
-    			append_dev(main, t8);
-    			append_dev(main, input1);
-    			append_dev(main, t9);
-    			append_dev(main, label2);
-    			append_dev(main, t11);
-    			append_dev(main, input2);
-    			append_dev(main, t12);
-    			append_dev(main, hr0);
-    			append_dev(main, t13);
-    			append_dev(main, button);
-    			append_dev(main, t15);
-    			append_dev(main, hr1);
-    			append_dev(main, t16);
-    			if (if_block) if_block.m(main, null);
-
-    			dispose = [
-    				listen_dev(input0, "click", /*add*/ ctx[2], false, false, false),
-    				listen_dev(input1, "click", /*add*/ ctx[2], false, false, false),
-    				listen_dev(input2, "click", /*add*/ ctx[2], false, false, false),
-    				listen_dev(button, "click", /*getRecipes*/ ctx[1], false, false, false)
-    			];
+    			append_dev(main, header);
+    			append_dev(header, h1);
+    			append_dev(header, t1);
+    			if (if_block) if_block.m(header, null);
     		},
     		p: function update(ctx, [dirty]) {
-    			if (/*recipe*/ ctx[0]) {
-    				if (if_block) {
-    					if_block.p(ctx, dirty);
-    				} else {
-    					if_block = create_if_block(ctx);
-    					if_block.c();
-    					if_block.m(main, null);
-    				}
-    			} else if (if_block) {
-    				if_block.d(1);
-    				if_block = null;
-    			}
+    			if (/*favorites*/ ctx[1].length > 0) if_block.p(ctx, dirty);
     		},
-    		i: noop,
+    		i: function intro(local) {
+    			transition_in(if_block);
+    		},
     		o: noop,
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(main);
     			if (if_block) if_block.d();
-    			run_all(dispose);
     		}
     	};
 
@@ -520,48 +635,57 @@ var app = (function (apikeys_js) {
     	return block;
     }
 
+    const limit = 1;
+
     function instance($$self, $$props, $$invalidate) {
-    	let ingredients = [];
-    	let recipe;
-    	const apikey = apikeys_js.apikeys.spoonacular.api_key;
+    	let joke;
+    	let favorites = [];
+    	let showFavs = false;
 
-    	const getRecipes = () => {
-    		fetch(`https://api.spoonacular.com/recipes/findByIngredients?apiKey=${apikey}&ingredients=${ingredients}&number=1`).then(res => res.json()).then(json => $$invalidate(0, recipe = json[0]));
+    	const getDadjoke = () => {
+    		joke = null;
+
+    		fetch(`https://icanhazdadjoke.com/`).this(res => res.json()).this(json => {
+    			
+    		});
     	};
 
-    	const add = e => {
-    		e.target.checked
-    		? $$invalidate(3, ingredients = [...ingredients, e.target.id])
-    		: ingredients.filter(i => i != e.target.id);
-    	};
+    	const addToFavs = () => {
+    		
+    	}; /*if(){
+
+    }else{
+
+    }
+    if()*/
+
+    	const click_handler = () => $$invalidate(0, showFavs = !showFavs);
 
     	$$self.$capture_state = () => ({
-    		apikeys: apikeys_js.apikeys,
-    		ingredients,
-    		recipe,
-    		apikey,
-    		getRecipes,
-    		add,
-    		console,
+    		jokes,
+    		fade,
+    		fly,
+    		scale,
+    		limit,
+    		joke,
+    		favorites,
+    		showFavs,
+    		getDadjoke,
+    		addToFavs,
     		fetch
     	});
 
     	$$self.$inject_state = $$props => {
-    		if ("ingredients" in $$props) $$invalidate(3, ingredients = $$props.ingredients);
-    		if ("recipe" in $$props) $$invalidate(0, recipe = $$props.recipe);
+    		if ("joke" in $$props) joke = $$props.joke;
+    		if ("favorites" in $$props) $$invalidate(1, favorites = $$props.favorites);
+    		if ("showFavs" in $$props) $$invalidate(0, showFavs = $$props.showFavs);
     	};
 
     	if ($$props && "$$inject" in $$props) {
     		$$self.$inject_state($$props.$$inject);
     	}
 
-    	$$self.$$.update = () => {
-    		if ($$self.$$.dirty & /*ingredients*/ 8) {
-    			 console.log(ingredients.toString());
-    		}
-    	};
-
-    	return [recipe, getRecipes, add];
+    	return [showFavs, favorites, joke, getDadjoke, addToFavs, click_handler];
     }
 
     class App extends SvelteComponentDev {
@@ -587,5 +711,5 @@ var app = (function (apikeys_js) {
 
     return app;
 
-}(apikeys_js));
+}(jokes));
 //# sourceMappingURL=bundle.js.map
