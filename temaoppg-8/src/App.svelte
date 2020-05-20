@@ -1,4 +1,7 @@
 <script>
+	import { scale, fly, fade } from 'svelte/transition'
+	import { BookmarkIcon} from 'svelte-eva-icons'
+
 	let q = ''
 	let dadjoke
 	let favorites = []
@@ -14,33 +17,70 @@
 	}
 
 	const getDadJoke = () => {
-		dadjoke = null
-		fetch(`https://icanhazdadjoke.com/search`)
-			.this( res => res.json() )
+		//dadjoke = null
+		fetch('https://icanhazdadjoke.com/', {
+		headers:{
+			Accept: 'application/json'}
+			})
+			.then( res => res.json() )
 				.then( json => {
-					dadjoke.json.data[0].joke
+					console.log(json)
+					dadjoke = json.joke
 				})
 	}
 </script>
 
 <main>
 	<header>
-		<h1>DadJokes</h1>
-		<input placeholder='Get silly' type="text" bind:value={q}>
+		<h1>Dad Jokes</h1>
 		<button on:click={getDadJoke}>Get dad joke</button>
+			{#if favorites.length > 0}
+				<button in:scale on:click={ () => showFaves = !showFaves}>
+					{ showFaves ? 'Hide favourites' : 'Show favourites' }
+				</button>
+			{/if}
 	</header>
 
+	{#if !showFaves}
 		{#if dadjoke}
-			<h3>{dadjoke.joke}</h3>
+			<h3>{dadjoke}</h3>
+				<div class='bookmark' on:click={()=>addToFaves(dadjoke)} style={favorites.includes(dadjoke) ? 'fill: #5946E8' : 'fill:white'}>
+					<BookmarkIcon/>
+				</div>
+			{:else}
+				<h2>Do like daddy cool and click</h2>
+		{/if}
 		{:else}
-		<h2>Search for some damn good dad jokes</h2>
+		<div class='favorites'>
+			{#each favorites as fav}
+					<div class="favorite">
+						<h3>{dadjoke}</h3>
+						<div class="bookmark" on:click={()=>addToFaves(fav)} style={favorites.includes(dadjoke) ? 'fill: #5946E8' : 'fill:white'}>
+							<BookmarkIcon/>
+						</div>
+					</div>
+				{/each}
+			</div>
+		<!-- {#if dadjoke}
+			<h3>{dadjoke}</h3>
+		{:else}
+		<h2>Dad jokes, only one click away...</h2>
+			<div class='bookmark'>
+				<BookmarkIcon/>
+			</div>	 -->
 	{/if}
+
+
 </main>
+
+
 
 <style>
 	:global(body, html) {
 		margin: 0;
 		padding: 0;
+		background: rgb(127,0,255);
+		background: linear-gradient(90deg, rgba(127,0,255,1) 0%, rgba(225,0,255,1) 100%);
 	}
 	:global(*) {
 		box-sizing: border-box;
@@ -56,19 +96,48 @@
 		margin: 0 auto;*/
 	}
 	h1 {
-		color: #4791f3;
+		color: #eee;
 		text-transform: uppercase;
 		font-size: 4em;
 		font-weight: 700;
 	}
 	h2 {
-		padding-top: 8rem;
+		padding-top: 45vh;
+		color: #eee;
+		font-weight: 300;
 	}
-	input {
+	h3 {
+		color: #eee;
+		width: 50vw;
+		padding-top: 5rem;
+	}
+	button {
 		border: none;
-		border-bottom: 1px solid black;
 		outline: none;
 		text-align: center;
+	}
+	.bookmark {	
+		bottom: 6rem;
+		height:4rem;
+		width:4rem;
+		fill: #eee;
+		position: absolute;
+	}
+	.favorite {
+		position: relative;
+	}
+	.favorites {
+		max-height: 60vh;
+		max-width: 80vw;
+    	/* overflow: scroll; */
+		display: grid;
+    	gap: 6rem;
+    	grid-template-columns: repeat(4, 100px);
+	}
+	.favorites .bookmark {
+		position: absolute;
+		align-items: right;
+		max-width: 2rem;
 	}
 	header {
 		position: absolute;
