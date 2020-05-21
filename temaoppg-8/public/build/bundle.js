@@ -677,7 +677,7 @@ var app = (function () {
     		c: function create() {
     			button = element("button");
     			t = text(t_value);
-    			attr_dev(button, "class", "svelte-erphni");
+    			attr_dev(button, "class", "svelte-8df58r");
     			add_location(button, file$1, 37, 4, 801);
     		},
     		m: function mount(target, anchor) {
@@ -740,7 +740,7 @@ var app = (function () {
     				each_blocks[i].c();
     			}
 
-    			attr_dev(div, "class", "favorites svelte-erphni");
+    			attr_dev(div, "class", "favorites svelte-8df58r");
     			add_location(div, file$1, 53, 2, 1246);
     		},
     		m: function mount(target, anchor) {
@@ -920,16 +920,16 @@ var app = (function () {
     			div0 = element("div");
     			create_component(bookmarkicon.$$.fragment);
     			t2 = space();
-    			attr_dev(h3, "class", "svelte-erphni");
+    			attr_dev(h3, "class", "svelte-8df58r");
     			add_location(h3, file$1, 56, 6, 1332);
-    			attr_dev(div0, "class", "bookmark svelte-erphni");
+    			attr_dev(div0, "class", "bookmark svelte-8df58r");
 
     			attr_dev(div0, "style", div0_style_value = /*favorites*/ ctx[1].includes(/*dadjoke*/ ctx[0])
     			? "fill: #5946E8"
     			: "fill:white");
 
     			add_location(div0, file$1, 57, 6, 1357);
-    			attr_dev(div1, "class", "favorite svelte-erphni");
+    			attr_dev(div1, "class", "favorite svelte-8df58r");
     			add_location(div1, file$1, 55, 5, 1303);
     		},
     		m: function mount(target, anchor) {
@@ -988,7 +988,7 @@ var app = (function () {
     		c: function create() {
     			h2 = element("h2");
     			h2.textContent = "Do like daddy cool and click";
-    			attr_dev(h2, "class", "svelte-erphni");
+    			attr_dev(h2, "class", "svelte-8df58r");
     			add_location(h2, file$1, 50, 4, 1188);
     		},
     		m: function mount(target, anchor) {
@@ -1031,9 +1031,9 @@ var app = (function () {
     			t1 = space();
     			div = element("div");
     			create_component(bookmarkicon.$$.fragment);
-    			attr_dev(h3, "class", "svelte-erphni");
+    			attr_dev(h3, "class", "svelte-8df58r");
     			add_location(h3, file$1, 45, 3, 991);
-    			attr_dev(div, "class", "bookmark svelte-erphni");
+    			attr_dev(div, "class", "bookmark svelte-8df58r");
 
     			attr_dev(div, "style", div_style_value = /*favorites*/ ctx[1].includes(/*dadjoke*/ ctx[0])
     			? "fill: #5946E8"
@@ -1125,13 +1125,13 @@ var app = (function () {
     			if (if_block0) if_block0.c();
     			t4 = space();
     			if_block1.c();
-    			attr_dev(h1, "class", "svelte-erphni");
+    			attr_dev(h1, "class", "svelte-8df58r");
     			add_location(h1, file$1, 34, 2, 694);
-    			attr_dev(button, "class", "svelte-erphni");
+    			attr_dev(button, "class", "svelte-8df58r");
     			add_location(button, file$1, 35, 2, 715);
-    			attr_dev(header, "class", "svelte-erphni");
+    			attr_dev(header, "class", "svelte-8df58r");
     			add_location(header, file$1, 33, 1, 683);
-    			attr_dev(main, "class", "svelte-erphni");
+    			attr_dev(main, "class", "svelte-8df58r");
     			add_location(main, file$1, 32, 0, 675);
     		},
     		l: function claim(nodes) {

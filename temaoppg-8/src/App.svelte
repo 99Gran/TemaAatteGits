@@ -61,13 +61,6 @@
 					</div>
 				{/each}
 			</div>
-		<!-- {#if dadjoke}
-			<h3>{dadjoke}</h3>
-		{:else}
-		<h2>Dad jokes, only one click away...</h2>
-			<div class='bookmark'>
-				<BookmarkIcon/>
-			</div>	 -->
 	{/if}
 
 
@@ -117,26 +110,28 @@
 		text-align: center;
 	}
 	.bookmark {	
-		bottom: 6rem;
-		height:4rem;
-		width:4rem;
+		bottom: 3rem;
+		height: 3rem;
+		width: 3rem;
 		fill: #eee;
 		position: absolute;
 	}
 	.favorite {
 		position: relative;
+		top: 3rem;
 	}
 	.favorites {
-		max-height: 60vh;
+		max-height: 80vh;
 		max-width: 80vw;
-    	/* overflow: scroll; */
+		/* overflow: scroll; */
 		display: grid;
     	gap: 6rem;
     	grid-template-columns: repeat(4, 100px);
 	}
 	.favorites .bookmark {
 		position: absolute;
-		align-items: right;
+		align-items: center;
+		top: 3rem;
 		max-width: 2rem;
 	}
 	header {
