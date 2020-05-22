@@ -26,41 +26,6 @@ var app = (function () {
         return a != a ? b == b : a !== b || ((a && typeof a === 'object') || typeof a === 'function');
     }
 
-    const is_client = typeof window !== 'undefined';
-    let now = is_client
-        ? () => window.performance.now()
-        : () => Date.now();
-    let raf = is_client ? cb => requestAnimationFrame(cb) : noop;
-
-    const tasks = new Set();
-    function run_tasks(now) {
-        tasks.forEach(task => {
-            if (!task.c(now)) {
-                tasks.delete(task);
-                task.f();
-            }
-        });
-        if (tasks.size !== 0)
-            raf(run_tasks);
-    }
-    /**
-     * Creates a new task that runs on each raf frame
-     * until it returns a falsy value or is aborted
-     */
-    function loop(callback) {
-        let task;
-        if (tasks.size === 0)
-            raf(run_tasks);
-        return {
-            promise: new Promise(fulfill => {
-                tasks.add(task = { c: callback, f: fulfill });
-            }),
-            abort() {
-                tasks.delete(task);
-            }
-        };
-    }
-
     function append(target, node) {
         target.appendChild(node);
     }
@@ -108,62 +73,6 @@ var app = (function () {
         const e = document.createEvent('CustomEvent');
         e.initCustomEvent(type, false, false, detail);
         return e;
-    }
-
-    let stylesheet;
-    let active = 0;
-    let current_rules = {};
-    // https://github.com/darkskyapp/string-hash/blob/master/index.js
-    function hash(str) {
-        let hash = 5381;
-        let i = str.length;
-        while (i--)
-            hash = ((hash << 5) - hash) ^ str.charCodeAt(i);
-        return hash >>> 0;
-    }
-    function create_rule(node, a, b, duration, delay, ease, fn, uid = 0) {
-        const step = 16.666 / duration;
-        let keyframes = '{\n';
-        for (let p = 0; p <= 1; p += step) {
-            const t = a + (b - a) * ease(p);
-            keyframes += p * 100 + `%{${fn(t, 1 - t)}}\n`;
-        }
-        const rule = keyframes + `100% {${fn(b, 1 - b)}}\n}`;
-        const name = `__svelte_${hash(rule)}_${uid}`;
-        if (!current_rules[name]) {
-            if (!stylesheet) {
-                const style = element('style');
-                document.head.appendChild(style);
-                stylesheet = style.sheet;
-            }
-            current_rules[name] = true;
-            stylesheet.insertRule(`@keyframes ${name} ${rule}`, stylesheet.cssRules.length);
-        }
-        const animation = node.style.animation || '';
-        node.style.animation = `${animation ? `${animation}, ` : ``}${name} ${duration}ms linear ${delay}ms 1 both`;
-        active += 1;
-        return name;
-    }
-    function delete_rule(node, name) {
-        node.style.animation = (node.style.animation || '')
-            .split(', ')
-            .filter(name
-            ? anim => anim.indexOf(name) < 0 // remove specific animation
-            : anim => anim.indexOf('__svelte') === -1 // remove all Svelte animations
-        )
-            .join(', ');
-        if (name && !--active)
-            clear_rules();
-    }
-    function clear_rules() {
-        raf(() => {
-            if (active)
-                return;
-            let i = stylesheet.cssRules.length;
-            while (i--)
-                stylesheet.deleteRule(i);
-            current_rules = {};
-        });
     }
 
     let current_component;
@@ -233,20 +142,6 @@ var app = (function () {
             $$.after_update.forEach(add_render_callback);
         }
     }
-
-    let promise;
-    function wait() {
-        if (!promise) {
-            promise = Promise.resolve();
-            promise.then(() => {
-                promise = null;
-            });
-        }
-        return promise;
-    }
-    function dispatch(node, direction, kind) {
-        node.dispatchEvent(custom_event(`${direction ? 'intro' : 'outro'}${kind}`));
-    }
     const outroing = new Set();
     let outros;
     function group_outros() {
@@ -283,69 +178,6 @@ var app = (function () {
             });
             block.o(local);
         }
-    }
-    const null_transition = { duration: 0 };
-    function create_in_transition(node, fn, params) {
-        let config = fn(node, params);
-        let running = false;
-        let animation_name;
-        let task;
-        let uid = 0;
-        function cleanup() {
-            if (animation_name)
-                delete_rule(node, animation_name);
-        }
-        function go() {
-            const { delay = 0, duration = 300, easing = identity, tick = noop, css } = config || null_transition;
-            if (css)
-                animation_name = create_rule(node, 0, 1, duration, delay, easing, css, uid++);
-            tick(0, 1);
-            const start_time = now() + delay;
-            const end_time = start_time + duration;
-            if (task)
-                task.abort();
-            running = true;
-            add_render_callback(() => dispatch(node, true, 'start'));
-            task = loop(now => {
-                if (running) {
-                    if (now >= end_time) {
-                        tick(1, 0);
-                        dispatch(node, true, 'end');
-                        cleanup();
-                        return running = false;
-                    }
-                    if (now >= start_time) {
-                        const t = easing((now - start_time) / duration);
-                        tick(t, 1 - t);
-                    }
-                }
-                return running;
-            });
-        }
-        let started = false;
-        return {
-            start() {
-                if (started)
-                    return;
-                delete_rule(node);
-                if (is_function(config)) {
-                    config = config();
-                    wait().then(go);
-                }
-                else {
-                    go();
-                }
-            },
-            invalidate() {
-                started = false;
-            },
-            end() {
-                if (running) {
-                    cleanup();
-                    running = false;
-                }
-            }
-        };
     }
     function create_component(block) {
         block && block.c();
@@ -670,15 +502,14 @@ var app = (function () {
     	: "Show favourites") + "";
 
     	let t;
-    	let button_intro;
     	let dispose;
 
     	const block = {
     		c: function create() {
     			button = element("button");
     			t = text(t_value);
-    			attr_dev(button, "class", "svelte-8df58r");
-    			add_location(button, file$1, 37, 4, 801);
+    			attr_dev(button, "class", "svelte-1r47at2");
+    			add_location(button, file$1, 37, 4, 799);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, button, anchor);
@@ -690,15 +521,6 @@ var app = (function () {
     			? "Hide favourites"
     			: "Show favourites") + "")) set_data_dev(t, t_value);
     		},
-    		i: function intro(local) {
-    			if (!button_intro) {
-    				add_render_callback(() => {
-    					button_intro = create_in_transition(button, scale, {});
-    					button_intro.start();
-    				});
-    			}
-    		},
-    		o: noop,
     		d: function destroy(detaching) {
     			if (detaching) detach_dev(button);
     			dispose();
@@ -740,8 +562,8 @@ var app = (function () {
     				each_blocks[i].c();
     			}
 
-    			attr_dev(div, "class", "favorites svelte-8df58r");
-    			add_location(div, file$1, 53, 2, 1246);
+    			attr_dev(div, "class", "favorites svelte-1r47at2");
+    			add_location(div, file$1, 53, 2, 1235);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div, anchor);
@@ -920,17 +742,17 @@ var app = (function () {
     			div0 = element("div");
     			create_component(bookmarkicon.$$.fragment);
     			t2 = space();
-    			attr_dev(h3, "class", "svelte-8df58r");
-    			add_location(h3, file$1, 56, 6, 1332);
-    			attr_dev(div0, "class", "bookmark svelte-8df58r");
+    			attr_dev(h3, "class", "svelte-1r47at2");
+    			add_location(h3, file$1, 56, 6, 1321);
+    			attr_dev(div0, "class", "bookmark svelte-1r47at2");
 
     			attr_dev(div0, "style", div0_style_value = /*favorites*/ ctx[1].includes(/*dadjoke*/ ctx[0])
     			? "fill: #5946E8"
     			: "fill:white");
 
-    			add_location(div0, file$1, 57, 6, 1357);
-    			attr_dev(div1, "class", "favorite svelte-8df58r");
-    			add_location(div1, file$1, 55, 5, 1303);
+    			add_location(div0, file$1, 57, 6, 1346);
+    			attr_dev(div1, "class", "favorite svelte-1r47at2");
+    			add_location(div1, file$1, 55, 5, 1292);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, div1, anchor);
@@ -988,8 +810,8 @@ var app = (function () {
     		c: function create() {
     			h2 = element("h2");
     			h2.textContent = "Do like daddy cool and click";
-    			attr_dev(h2, "class", "svelte-8df58r");
-    			add_location(h2, file$1, 50, 4, 1188);
+    			attr_dev(h2, "class", "svelte-1r47at2");
+    			add_location(h2, file$1, 50, 4, 1177);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, h2, anchor);
@@ -1031,15 +853,15 @@ var app = (function () {
     			t1 = space();
     			div = element("div");
     			create_component(bookmarkicon.$$.fragment);
-    			attr_dev(h3, "class", "svelte-8df58r");
-    			add_location(h3, file$1, 45, 3, 991);
-    			attr_dev(div, "class", "bookmark svelte-8df58r");
+    			attr_dev(h3, "class", "svelte-1r47at2");
+    			add_location(h3, file$1, 45, 3, 980);
+    			attr_dev(div, "class", "bookmark svelte-1r47at2");
 
     			attr_dev(div, "style", div_style_value = /*favorites*/ ctx[1].includes(/*dadjoke*/ ctx[0])
     			? "fill: #5946E8"
     			: "fill:white");
 
-    			add_location(div, file$1, 46, 4, 1014);
+    			add_location(div, file$1, 46, 4, 1003);
     		},
     		m: function mount(target, anchor) {
     			insert_dev(target, h3, anchor);
@@ -1125,14 +947,14 @@ var app = (function () {
     			if (if_block0) if_block0.c();
     			t4 = space();
     			if_block1.c();
-    			attr_dev(h1, "class", "svelte-8df58r");
-    			add_location(h1, file$1, 34, 2, 694);
-    			attr_dev(button, "class", "svelte-8df58r");
-    			add_location(button, file$1, 35, 2, 715);
-    			attr_dev(header, "class", "svelte-8df58r");
-    			add_location(header, file$1, 33, 1, 683);
-    			attr_dev(main, "class", "svelte-8df58r");
-    			add_location(main, file$1, 32, 0, 675);
+    			attr_dev(h1, "class", "svelte-1r47at2");
+    			add_location(h1, file$1, 34, 2, 692);
+    			attr_dev(button, "class", "svelte-1r47at2");
+    			add_location(button, file$1, 35, 2, 713);
+    			attr_dev(header, "class", "svelte-1r47at2");
+    			add_location(header, file$1, 33, 1, 681);
+    			attr_dev(main, "class", "svelte-1r47at2");
+    			add_location(main, file$1, 32, 0, 673);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -1154,11 +976,9 @@ var app = (function () {
     			if (/*favorites*/ ctx[1].length > 0) {
     				if (if_block0) {
     					if_block0.p(ctx, dirty);
-    					transition_in(if_block0, 1);
     				} else {
     					if_block0 = create_if_block_2(ctx);
     					if_block0.c();
-    					transition_in(if_block0, 1);
     					if_block0.m(header, null);
     				}
     			} else if (if_block0) {
@@ -1192,7 +1012,6 @@ var app = (function () {
     		},
     		i: function intro(local) {
     			if (current) return;
-    			transition_in(if_block0);
     			transition_in(if_block1);
     			current = true;
     		},
@@ -1236,7 +1055,8 @@ var app = (function () {
     	};
 
     	const getDadJoke = () => {
-    		//dadjoke = null
+    		$$invalidate(0, dadjoke = null);
+
     		fetch("https://icanhazdadjoke.com/", { headers: { Accept: "application/json" } }).then(res => res.json()).then(json => {
     			console.log(json);
     			$$invalidate(0, dadjoke = json.joke);

@@ -17,7 +17,7 @@
 	}
 
 	const getDadJoke = () => {
-		//dadjoke = null
+		dadjoke = null
 		fetch('https://icanhazdadjoke.com/', {
 		headers:{
 			Accept: 'application/json'}
@@ -35,7 +35,7 @@
 		<h1>Dad Jokes</h1>
 		<button on:click={getDadJoke}>Get dad joke</button>
 			{#if favorites.length > 0}
-				<button in:scale on:click={ () => showFaves = !showFaves}>
+				<button on:click={ () => showFaves = !showFaves}>
 					{ showFaves ? 'Hide favourites' : 'Show favourites' }
 				</button>
 			{/if}
@@ -56,16 +56,13 @@
 					<div class="favorite">
 						<h3>{dadjoke}</h3>
 						<div class="bookmark" on:click={()=>addToFaves(fav)} style={favorites.includes(dadjoke) ? 'fill: #5946E8' : 'fill:white'}>
-							<BookmarkIcon/>
+							<BookmarkIcon />
 						</div>
 					</div>
 				{/each}
 			</div>
 	{/if}
-
-
 </main>
-
 
 
 <style>
@@ -121,18 +118,19 @@
 		top: 3rem;
 	}
 	.favorites {
-		max-height: 80vh;
-		max-width: 80vw;
+		max-height: 40vh;
+		max-width: 90vw;
 		/* overflow: scroll; */
 		display: grid;
-    	gap: 6rem;
-    	grid-template-columns: repeat(4, 100px);
+    	gap: 1rem;
+    	grid-template-columns: repeat(2, 100px);
+		padding: 0 5rem 0 0;
 	}
 	.favorites .bookmark {
 		position: absolute;
-		align-items: center;
-		top: 3rem;
-		max-width: 2rem;
+		/* align-items: center; */
+		top: 3.5rem;
+		max-width: 2.5rem;
 	}
 	header {
 		position: absolute;
