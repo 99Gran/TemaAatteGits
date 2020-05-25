@@ -1,6 +1,6 @@
 <script>
 	import { scale, fly, fade } from 'svelte/transition'
-	import { BookmarkIcon} from 'svelte-eva-icons'
+	import Dadjoke from './Dadjoke.svelte'
 
 	let q = ''
 	let dadjoke
@@ -17,6 +17,7 @@
 	}
 
 	const getDadJoke = () => {
+		showFaves = false
 		dadjoke = null
 		fetch('https://icanhazdadjoke.com/', {
 		headers:{
@@ -28,6 +29,8 @@
 					dadjoke = json.joke
 				})
 	}
+
+	$: console.log(favorites)
 </script>
 
 <main>
@@ -43,24 +46,18 @@
 
 	{#if !showFaves}
 		{#if dadjoke}
-			<h3>{dadjoke}</h3>
-				<div class='bookmark' on:click={()=>addToFaves(dadjoke)} style={favorites.includes(dadjoke) ? 'fill: #5946E8' : 'fill:white'}>
-					<BookmarkIcon/>
-				</div>
-			{:else}
-				<h2>Do like daddy cool and click</h2>
+			<div class="dadjokes">
+			<Dadjoke {dadjoke} {addToFaves} {favorites}/>
+			</div>
+		{:else}
+			<h2>Do like daddy cool and click the button</h2>
 		{/if}
 		{:else}
 		<div class='favorites'>
 			{#each favorites as fav}
-					<div class="favorite">
-						<h3>{dadjoke}</h3>
-						<div class="bookmark" on:click={()=>addToFaves(fav)} style={favorites.includes(dadjoke) ? 'fill: #5946E8' : 'fill:white'}>
-							<BookmarkIcon />
-						</div>
-					</div>
-				{/each}
-			</div>
+				<Dadjoke dadjoke={fav} {addToFaves} {favorites}/>	
+			{/each}
+		</div>
 	{/if}
 </main>
 
@@ -77,6 +74,7 @@
 	}
 	main {
 		display: grid;
+		grid-template-rows: 35vh auto;
 		place-items: center;
 		height: 100%;
 		position: relative;
@@ -92,50 +90,26 @@
 		font-weight: 700;
 	}
 	h2 {
-		padding-top: 45vh;
 		color: #eee;
 		font-weight: 300;
-	}
-	h3 {
-		color: #eee;
-		width: 50vw;
-		padding-top: 5rem;
 	}
 	button {
 		border: none;
 		outline: none;
 		text-align: center;
+		width: 20vw;
+		padding: .7rem;
 	}
-	.bookmark {	
-		bottom: 3rem;
-		height: 3rem;
-		width: 3rem;
-		fill: #eee;
-		position: absolute;
-	}
-	.favorite {
-		position: relative;
-		top: 3rem;
+	.dadjokes {
+		display: grid;
+		grid-template-rows: 1fr 1fr;
+		width: 70vw;
 	}
 	.favorites {
-		max-height: 40vh;
-		max-width: 90vw;
-		/* overflow: scroll; */
+		background-color: gray;
 		display: grid;
-    	gap: 1rem;
-    	grid-template-columns: repeat(2, 100px);
-		padding: 0 5rem 0 0;
-	}
-	.favorites .bookmark {
-		position: absolute;
-		/* align-items: center; */
-		top: 3.5rem;
-		max-width: 2.5rem;
-	}
-	header {
-		position: absolute;
-		top: 2rem;
-		width: 50%;
-		display: grid;
+		grid-template-columns: 1fr 1fr;
+		width: 90vw;
+		gap: 1.5rem;
 	}
 </style>
