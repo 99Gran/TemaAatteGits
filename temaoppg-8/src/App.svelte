@@ -74,14 +74,11 @@
 	}
 	main {
 		display: grid;
-		grid-template-rows: 35vh auto;
+		grid-template-rows: 40vh auto;
 		place-items: center;
 		height: 100%;
 		position: relative;
 		text-align: center;
-		/* padding: 1em;
-		max-width: 240px;
-		margin: 0 auto;*/
 	}
 	h1 {
 		color: #eee;
@@ -97,19 +94,20 @@
 		border: none;
 		outline: none;
 		text-align: center;
-		width: 20vw;
-		padding: .7rem;
+		width: 18vw;
+		padding: .8rem;
 	}
 	.dadjokes {
+		width: 60vw;
+		align-self: center;
 		display: grid;
-		grid-template-rows: 1fr 1fr;
-		width: 70vw;
+		grid-template-rows: 2fr;
 	}
 	.favorites {
-		background-color: gray;
+		/* background-color: gray; */
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		width: 90vw;
-		gap: 1.5rem;
+		gap: 2rem;
 	}
 </style>
