@@ -507,14 +507,14 @@ var app = (function () {
     			div0 = element("div");
     			create_component(bookmarkicon.$$.fragment);
     			add_location(h3, file$1, 10, 1, 170);
-    			attr_dev(div0, "class", "bookmark");
+    			attr_dev(div0, "class", "bookmark svelte-616dq4");
 
     			attr_dev(div0, "style", div0_style_value = /*favorites*/ ctx[2].includes(/*dadjoke*/ ctx[0])
     			? "fill: #5946E8"
     			: "fill:white");
 
     			add_location(div0, file$1, 11, 1, 190);
-    			attr_dev(div1, "class", "dadjoke svelte-9369kl");
+    			attr_dev(div1, "class", "dadjoke svelte-616dq4");
     			add_location(div1, file$1, 9, 0, 147);
     		},
     		l: function claim(nodes) {
@@ -681,7 +681,7 @@ var app = (function () {
     		c: function create() {
     			button = element("button");
     			t = text(t_value);
-    			attr_dev(button, "class", "svelte-m97w36");
+    			attr_dev(button, "class", "svelte-5tof35");
     			add_location(button, file$2, 40, 4, 839);
     		},
     		m: function mount(target, anchor) {
@@ -735,7 +735,7 @@ var app = (function () {
     				each_blocks[i].c();
     			}
 
-    			attr_dev(div, "class", "favorites svelte-m97w36");
+    			attr_dev(div, "class", "favorites svelte-5tof35");
     			add_location(div, file$2, 55, 2, 1184);
     		},
     		m: function mount(target, anchor) {
@@ -949,7 +949,7 @@ var app = (function () {
     		c: function create() {
     			h2 = element("h2");
     			h2.textContent = "Do like daddy cool and click the button";
-    			attr_dev(h2, "class", "svelte-m97w36");
+    			attr_dev(h2, "class", "svelte-5tof35");
     			add_location(h2, file$2, 52, 3, 1115);
     		},
     		m: function mount(target, anchor) {
@@ -992,7 +992,7 @@ var app = (function () {
     		c: function create() {
     			div = element("div");
     			create_component(dadjoke_1.$$.fragment);
-    			attr_dev(div, "class", "dadjokes svelte-m97w36");
+    			attr_dev(div, "class", "dadjokes svelte-5tof35");
     			add_location(div, file$2, 48, 3, 1020);
     		},
     		m: function mount(target, anchor) {
@@ -1069,12 +1069,12 @@ var app = (function () {
     			if (if_block0) if_block0.c();
     			t4 = space();
     			if_block1.c();
-    			attr_dev(h1, "class", "svelte-m97w36");
+    			attr_dev(h1, "class", "svelte-5tof35");
     			add_location(h1, file$2, 37, 2, 732);
-    			attr_dev(button, "class", "svelte-m97w36");
+    			attr_dev(button, "class", "svelte-5tof35");
     			add_location(button, file$2, 38, 2, 753);
     			add_location(header, file$2, 36, 1, 721);
-    			attr_dev(main, "class", "svelte-m97w36");
+    			attr_dev(main, "class", "svelte-5tof35");
     			add_location(main, file$2, 35, 0, 713);
     		},
     		l: function claim(nodes) {

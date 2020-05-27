@@ -23,4 +23,9 @@
         overflow: scroll;
         align-items: center;
     }
+    .bookmark {
+        margin: .1rem;
+        max-width: 3rem;
+        max-height: 3rem;
+    }
 </style>

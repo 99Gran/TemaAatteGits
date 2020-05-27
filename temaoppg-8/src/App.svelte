@@ -94,17 +94,15 @@
 		border: none;
 		outline: none;
 		text-align: center;
-		width: 18vw;
+		max-width: 18vw;
 		padding: .8rem;
 	}
 	.dadjokes {
-		width: 60vw;
-		align-self: center;
+		width: 50vw;
 		display: grid;
-		grid-template-rows: 2fr;
+		grid-template-rows: 1fr;
 	}
 	.favorites {
-		/* background-color: gray; */
 		display: grid;
 		grid-template-columns: 1fr 1fr;
 		width: 90vw;
