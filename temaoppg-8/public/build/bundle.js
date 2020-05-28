@@ -508,14 +508,14 @@ var app = (function () {
     			div0 = element("div");
     			create_component(bookmarkicon.$$.fragment);
     			add_location(h3, file$1, 11, 1, 232);
-    			attr_dev(div0, "class", "bookmark svelte-4v1wjo");
+    			attr_dev(div0, "class", "bookmark svelte-1tjehzo");
 
     			attr_dev(div0, "style", div0_style_value = /*favorites*/ ctx[2].includes(/*dadjoke*/ ctx[0])
     			? "fill: #5946E8"
     			: "fill:white");
 
     			add_location(div0, file$1, 12, 1, 252);
-    			attr_dev(div1, "class", div1_class_value = "dadjoke " + (/*favorite*/ ctx[3] ? "fav" : "notfav") + " svelte-4v1wjo");
+    			attr_dev(div1, "class", div1_class_value = "dadjoke " + (/*favorite*/ ctx[3] ? "fav" : "notfav") + " svelte-1tjehzo");
     			add_location(div1, file$1, 10, 0, 179);
     		},
     		l: function claim(nodes) {
@@ -540,7 +540,7 @@ var app = (function () {
     				attr_dev(div0, "style", div0_style_value);
     			}
 
-    			if (!current || dirty & /*favorite*/ 8 && div1_class_value !== (div1_class_value = "dadjoke " + (/*favorite*/ ctx[3] ? "fav" : "notfav") + " svelte-4v1wjo")) {
+    			if (!current || dirty & /*favorite*/ 8 && div1_class_value !== (div1_class_value = "dadjoke " + (/*favorite*/ ctx[3] ? "fav" : "notfav") + " svelte-1tjehzo")) {
     				attr_dev(div1, "class", div1_class_value);
     			}
     		},
@@ -704,7 +704,7 @@ var app = (function () {
     		c: function create() {
     			button = element("button");
     			t = text(t_value);
-    			attr_dev(button, "class", "svelte-tz3an7");
+    			attr_dev(button, "class", "svelte-12kku1l");
     			add_location(button, file$2, 40, 4, 839);
     		},
     		m: function mount(target, anchor) {
@@ -758,7 +758,7 @@ var app = (function () {
     				each_blocks[i].c();
     			}
 
-    			attr_dev(div, "class", "favorites svelte-tz3an7");
+    			attr_dev(div, "class", "favorites svelte-12kku1l");
     			add_location(div, file$2, 55, 2, 1184);
     		},
     		m: function mount(target, anchor) {
@@ -973,7 +973,7 @@ var app = (function () {
     		c: function create() {
     			h2 = element("h2");
     			h2.textContent = "Do like daddy cool and click the button";
-    			attr_dev(h2, "class", "svelte-tz3an7");
+    			attr_dev(h2, "class", "svelte-12kku1l");
     			add_location(h2, file$2, 52, 3, 1115);
     		},
     		m: function mount(target, anchor) {
@@ -1016,7 +1016,7 @@ var app = (function () {
     		c: function create() {
     			div = element("div");
     			create_component(dadjoke_1.$$.fragment);
-    			attr_dev(div, "class", "dadjokes svelte-tz3an7");
+    			attr_dev(div, "class", "dadjokes svelte-12kku1l");
     			add_location(div, file$2, 48, 3, 1020);
     		},
     		m: function mount(target, anchor) {
@@ -1093,12 +1093,12 @@ var app = (function () {
     			if (if_block0) if_block0.c();
     			t4 = space();
     			if_block1.c();
-    			attr_dev(h1, "class", "svelte-tz3an7");
+    			attr_dev(h1, "class", "svelte-12kku1l");
     			add_location(h1, file$2, 37, 2, 732);
-    			attr_dev(button, "class", "svelte-tz3an7");
+    			attr_dev(button, "class", "svelte-12kku1l");
     			add_location(button, file$2, 38, 2, 753);
     			add_location(header, file$2, 36, 1, 721);
-    			attr_dev(main, "class", "svelte-tz3an7");
+    			attr_dev(main, "class", "svelte-12kku1l");
     			add_location(main, file$2, 35, 0, 713);
     		},
     		l: function claim(nodes) {

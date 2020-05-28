@@ -89,6 +89,7 @@
 	h2 {
 		color: #eee;
 		font-weight: 300;
+		width: 60vw;
 	}
 	button {
 		border: none;
@@ -96,15 +97,11 @@
 		text-align: center;
 		align-items: center;
 		width: 40vw;
-		/* display: grid;
-		grid-template-rows: 1fr 1fr; */
 	}
 	.dadjokes {
 		width: 80vw;
 	}
 	.favorites {
-		/* display: grid;
-		grid-template-columns: 1fr 1fr; */
 		width: 90vw;
 		gap: 2rem;
 	}

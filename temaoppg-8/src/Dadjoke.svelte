@@ -30,7 +30,7 @@
         align-items: center;
     }
     .fav.bookmark {
-        margin: .1rem;
+        margin: 1rem;
     }
     .bookmark {
         width: 3rem;
