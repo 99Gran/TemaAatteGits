@@ -55,7 +55,7 @@
 		{:else}
 		<div class='favorites'>
 			{#each favorites as fav}
-				<Dadjoke dadjoke={fav} {addToFaves} {favorites}/>	
+				<Dadjoke favorite={true} dadjoke={fav} {addToFaves} {favorites}/>	
 			{/each}
 		</div>
 	{/if}
@@ -94,17 +94,17 @@
 		border: none;
 		outline: none;
 		text-align: center;
-		max-width: 18vw;
-		padding: .8rem;
+		align-items: center;
+		width: 40vw;
+		/* display: grid;
+		grid-template-rows: 1fr 1fr; */
 	}
 	.dadjokes {
-		width: 50vw;
-		display: grid;
-		grid-template-rows: 1fr;
+		width: 80vw;
 	}
 	.favorites {
-		display: grid;
-		grid-template-columns: 1fr 1fr;
+		/* display: grid;
+		grid-template-columns: 1fr 1fr; */
 		width: 90vw;
 		gap: 2rem;
 	}

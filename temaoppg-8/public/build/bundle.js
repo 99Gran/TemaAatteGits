@@ -494,6 +494,7 @@ var app = (function () {
     	let t1;
     	let div0;
     	let div0_style_value;
+    	let div1_class_value;
     	let current;
     	let dispose;
     	const bookmarkicon = new BookmarkIcon({ $$inline: true });
@@ -506,16 +507,16 @@ var app = (function () {
     			t1 = space();
     			div0 = element("div");
     			create_component(bookmarkicon.$$.fragment);
-    			add_location(h3, file$1, 10, 1, 170);
-    			attr_dev(div0, "class", "bookmark svelte-616dq4");
+    			add_location(h3, file$1, 11, 1, 232);
+    			attr_dev(div0, "class", "bookmark svelte-4v1wjo");
 
     			attr_dev(div0, "style", div0_style_value = /*favorites*/ ctx[2].includes(/*dadjoke*/ ctx[0])
     			? "fill: #5946E8"
     			: "fill:white");
 
-    			add_location(div0, file$1, 11, 1, 190);
-    			attr_dev(div1, "class", "dadjoke svelte-616dq4");
-    			add_location(div1, file$1, 9, 0, 147);
+    			add_location(div0, file$1, 12, 1, 252);
+    			attr_dev(div1, "class", div1_class_value = "dadjoke " + (/*favorite*/ ctx[3] ? "fav" : "notfav") + " svelte-4v1wjo");
+    			add_location(div1, file$1, 10, 0, 179);
     		},
     		l: function claim(nodes) {
     			throw new Error("options.hydrate only works if the component was compiled with the `hydratable: true` option");
@@ -528,7 +529,7 @@ var app = (function () {
     			append_dev(div1, div0);
     			mount_component(bookmarkicon, div0, null);
     			current = true;
-    			dispose = listen_dev(div0, "click", /*click_handler*/ ctx[3], false, false, false);
+    			dispose = listen_dev(div0, "click", /*click_handler*/ ctx[4], false, false, false);
     		},
     		p: function update(ctx, [dirty]) {
     			if (!current || dirty & /*dadjoke*/ 1) set_data_dev(t0, /*dadjoke*/ ctx[0]);
@@ -537,6 +538,10 @@ var app = (function () {
     			? "fill: #5946E8"
     			: "fill:white")) {
     				attr_dev(div0, "style", div0_style_value);
+    			}
+
+    			if (!current || dirty & /*favorite*/ 8 && div1_class_value !== (div1_class_value = "dadjoke " + (/*favorite*/ ctx[3] ? "fav" : "notfav") + " svelte-4v1wjo")) {
+    				attr_dev(div1, "class", div1_class_value);
     			}
     		},
     		i: function intro(local) {
@@ -570,7 +575,8 @@ var app = (function () {
     	let { dadjoke } = $$props;
     	let { addToFaves } = $$props;
     	let { favorites } = $$props;
-    	const writable_props = ["dadjoke", "addToFaves", "favorites"];
+    	let { favorite = false } = $$props;
+    	const writable_props = ["dadjoke", "addToFaves", "favorites", "favorite"];
 
     	Object.keys($$props).forEach(key => {
     		if (!~writable_props.indexOf(key) && key.slice(0, 2) !== "$$") console.warn(`<Dadjoke> was created with unknown prop '${key}'`);
@@ -582,32 +588,41 @@ var app = (function () {
     		if ("dadjoke" in $$props) $$invalidate(0, dadjoke = $$props.dadjoke);
     		if ("addToFaves" in $$props) $$invalidate(1, addToFaves = $$props.addToFaves);
     		if ("favorites" in $$props) $$invalidate(2, favorites = $$props.favorites);
+    		if ("favorite" in $$props) $$invalidate(3, favorite = $$props.favorite);
     	};
 
     	$$self.$capture_state = () => ({
     		BookmarkIcon,
     		dadjoke,
     		addToFaves,
-    		favorites
+    		favorites,
+    		favorite
     	});
 
     	$$self.$inject_state = $$props => {
     		if ("dadjoke" in $$props) $$invalidate(0, dadjoke = $$props.dadjoke);
     		if ("addToFaves" in $$props) $$invalidate(1, addToFaves = $$props.addToFaves);
     		if ("favorites" in $$props) $$invalidate(2, favorites = $$props.favorites);
+    		if ("favorite" in $$props) $$invalidate(3, favorite = $$props.favorite);
     	};
 
     	if ($$props && "$$inject" in $$props) {
     		$$self.$inject_state($$props.$$inject);
     	}
 
-    	return [dadjoke, addToFaves, favorites, click_handler];
+    	return [dadjoke, addToFaves, favorites, favorite, click_handler];
     }
 
     class Dadjoke extends SvelteComponentDev {
     	constructor(options) {
     		super(options);
-    		init(this, options, instance, create_fragment$1, safe_not_equal, { dadjoke: 0, addToFaves: 1, favorites: 2 });
+
+    		init(this, options, instance, create_fragment$1, safe_not_equal, {
+    			dadjoke: 0,
+    			addToFaves: 1,
+    			favorites: 2,
+    			favorite: 3
+    		});
 
     		dispatch_dev("SvelteRegisterComponent", {
     			component: this,
@@ -655,6 +670,14 @@ var app = (function () {
     	set favorites(value) {
     		throw new Error("<Dadjoke>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
     	}
+
+    	get favorite() {
+    		throw new Error("<Dadjoke>: Props cannot be read directly from the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
+
+    	set favorite(value) {
+    		throw new Error("<Dadjoke>: Props cannot be set directly on the component instance unless compiling with 'accessors: true' or '<svelte:options accessors/>'");
+    	}
     }
 
     /* src/App.svelte generated by Svelte v3.19.1 */
@@ -681,7 +704,7 @@ var app = (function () {
     		c: function create() {
     			button = element("button");
     			t = text(t_value);
-    			attr_dev(button, "class", "svelte-5tof35");
+    			attr_dev(button, "class", "svelte-tz3an7");
     			add_location(button, file$2, 40, 4, 839);
     		},
     		m: function mount(target, anchor) {
@@ -735,7 +758,7 @@ var app = (function () {
     				each_blocks[i].c();
     			}
 
-    			attr_dev(div, "class", "favorites svelte-5tof35");
+    			attr_dev(div, "class", "favorites svelte-tz3an7");
     			add_location(div, file$2, 55, 2, 1184);
     		},
     		m: function mount(target, anchor) {
@@ -895,6 +918,7 @@ var app = (function () {
 
     	const dadjoke_1 = new Dadjoke({
     			props: {
+    				favorite: true,
     				dadjoke: /*fav*/ ctx[7],
     				addToFaves: /*addToFaves*/ ctx[3],
     				favorites: /*favorites*/ ctx[1]
@@ -949,7 +973,7 @@ var app = (function () {
     		c: function create() {
     			h2 = element("h2");
     			h2.textContent = "Do like daddy cool and click the button";
-    			attr_dev(h2, "class", "svelte-5tof35");
+    			attr_dev(h2, "class", "svelte-tz3an7");
     			add_location(h2, file$2, 52, 3, 1115);
     		},
     		m: function mount(target, anchor) {
@@ -992,7 +1016,7 @@ var app = (function () {
     		c: function create() {
     			div = element("div");
     			create_component(dadjoke_1.$$.fragment);
-    			attr_dev(div, "class", "dadjokes svelte-5tof35");
+    			attr_dev(div, "class", "dadjokes svelte-tz3an7");
     			add_location(div, file$2, 48, 3, 1020);
     		},
     		m: function mount(target, anchor) {
@@ -1069,12 +1093,12 @@ var app = (function () {
     			if (if_block0) if_block0.c();
     			t4 = space();
     			if_block1.c();
-    			attr_dev(h1, "class", "svelte-5tof35");
+    			attr_dev(h1, "class", "svelte-tz3an7");
     			add_location(h1, file$2, 37, 2, 732);
-    			attr_dev(button, "class", "svelte-5tof35");
+    			attr_dev(button, "class", "svelte-tz3an7");
     			add_location(button, file$2, 38, 2, 753);
     			add_location(header, file$2, 36, 1, 721);
-    			attr_dev(main, "class", "svelte-5tof35");
+    			attr_dev(main, "class", "svelte-tz3an7");
     			add_location(main, file$2, 35, 0, 713);
     		},
     		l: function claim(nodes) {
